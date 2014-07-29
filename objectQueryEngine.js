@@ -7,6 +7,7 @@ define([
 
 	return {
 		filter: function (query) {
+			var store = this;
 			// create our matching query function
 			var queryer = query;
 			var queryAccessors = this.queryAccessors;
@@ -17,14 +18,21 @@ define([
 				case 'undefined':
 					var queryObject = query;
 					queryer = function (object) {
+
 						for (var key in queryObject) {
 							var required = queryObject[key];
+
+							var objectValue = object.get ? object.get(key) : object[key];
+							if( store.ignoreCaseInFilter ){
+								objectValue.toUpperCase && ( objectValue = objectValue.toUpperCase() );
+							}
 							if (required && required.test) {
 								// an object can provide a test method, which makes it work with regex
-								if (!required.test(queryAccessors && object.get ? object.get(key) : object[key], object)) {
+
+								if (!required.test(queryAccessors && objectValue, object)) {
 									return false;
 								}
-							} else if (required !== (queryAccessors && object.get ? object.get(key) : object[key])) {
+							} else if (required !== (queryAccessors && objectValue)) {
 								return false;
 							}
 						}
@@ -55,6 +63,7 @@ define([
 
 		/* jshint ignore:start */
 		sort: function (sorted) {
+			var store = this;
 			return function (data) {
 				data = data.slice();
 				data.sort(typeof sorted == 'function' ? sorted : function (a, b) {
@@ -70,6 +79,11 @@ define([
 
 							aValue != null && (aValue = aValue.valueOf());
 							bValue != null && (bValue = bValue.valueOf());
+
+							if( store.ignoreCaseInSort ){
+								aValue.toUpperCase  && ( aValue = aValue.toUpperCase() );
+								bValue.toUpperCase  && ( bValue = bValue.toUpperCase() );
+							}
 
 							comparison = aValue === bValue
 								? 0
