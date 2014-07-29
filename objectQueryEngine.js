@@ -24,7 +24,8 @@ define([
 
 							var objectValue = object.get ? object.get(key) : object[key];
 							if( store.ignoreCaseInFilter ){
-								objectValue.toUpperCase && ( objectValue = objectValue.toUpperCase() );
+								objectValue.toUpperCase && ( objectValue = objectValue.toUpperCase());
+								required.toUpperCase && ( required = required.toUpperCase());
 							}
 							if (required && required.test) {
 								// an object can provide a test method, which makes it work with regex
